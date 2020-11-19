@@ -20,6 +20,7 @@ scipy = "^1.5.2"
 h5py = "^2.10.0"
 numba = "^0.51.2"
 matplotlib = "^3.3.2"
+ConfigArgParse = "^1.2.3"
 
 [tool.poetry.dev-dependencies]
 lalsuite = "^6.77"
