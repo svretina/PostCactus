@@ -248,7 +248,7 @@ test = ["pytest (>=3.6.0,!=3.9.0,!=3.9.1,!=3.9.2)", "pretend", "iso8601", "pytz"
 name = "cycler"
 version = "0.10.0"
 description = "Composable style cycles"
-category = "dev"
+category = "main"
 optional = false
 python-versions = "*"
 
@@ -598,7 +598,7 @@ pygments = ">=2.4.1,<3"
 name = "kiwisolver"
 version = "1.3.1"
 description = "A fast implementation of the Cassowary constraint solver"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 
@@ -682,7 +682,7 @@ python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*"
 name = "matplotlib"
 version = "3.3.3"
 description = "Python plotting package"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 
@@ -953,7 +953,7 @@ python-versions = "*"
 name = "pillow"
 version = "8.0.1"
 description = "Python Imaging Library (Fork)"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 
@@ -1085,7 +1085,7 @@ test = ["flaky", "pretend", "pytest (>=3.0.1)"]
 name = "pyparsing"
 version = "2.4.7"
 description = "Python parsing module"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
 
@@ -1101,7 +1101,7 @@ python-versions = ">=3.5"
 name = "python-dateutil"
 version = "2.8.1"
 description = "Extensions to the standard Python datetime module"
-category = "dev"
+category = "main"
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,>=2.7"
 
@@ -1527,7 +1527,7 @@ testing = ["pytest (>=3.5,!=3.7.3)", "pytest-checkdocs (>=1.2.3)", "pytest-flake
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6"
-content-hash = "aa69d1d3ac457b70c2d95acf9daafd6ffd19bc1a1db53e4bd9eaebf0294ae935"
+content-hash = "fe730c23967656464581b761a86bad47aff3622221a66fbe040871d39c8459fe"
 
 [metadata.files]
 alabaster = [
