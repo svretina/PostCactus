@@ -41,6 +41,7 @@ For a full list of available features, see the :doc:`features page <features>`.
   ``QuasiLocalMeasures`` and ``AHFinderDirect``.
 - Handle unit conversion, in particular from geometrized to physical
   (:py:mod:`~.unitconv`).
+- Visualize data with matplotlib (:py:mod:`~.visualize`).
 
 Installation
 ------------
@@ -75,6 +76,7 @@ Usage
    grid_data.rst
    sensitivity_curves.rst
    unitconv.rst
+   visualize.rst
 
 Examples
 --------
@@ -110,6 +112,7 @@ Reference material (classes, functions, ...)
    grid_data_ref.rst
    sensitivity_curves_ref.rst
    unitconv_ref.rst
+   visualize_ref.rst
 
 Credits
 -------
