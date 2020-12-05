@@ -57,14 +57,16 @@ class TestPyUtils(unittest.TestCase):
         )
 
         # Now three sets of three points
-        arr2 = [[[2, 3], [10, 20], [-4, -6]],
-                [[5, 1], [1, 2], [8, 11]],
-                [[0, 1], [2, 3], [-1, -2]],
-                ]
-        exp_arr2 = [[[4, 6], [20, 40], [-8, -12]],
-                    [[10, 2], [2, 4], [16, 22]],
-                    [[0, 2], [4, 6], [-2, -4]],
-                    ]
+        arr2 = [
+            [[2, 3], [10, 20], [-4, -6]],
+            [[5, 1], [1, 2], [8, 11]],
+            [[0, 1], [2, 3], [-1, -2]],
+        ]
+        exp_arr2 = [
+            [[4, 6], [20, 40], [-8, -12]],
+            [[10, 2], [2, 4], [16, 22]],
+            [[0, 2], [4, 6], [-2, -4]],
+        ]
         self.assertTrue(
             np.array_equal(put.apply_to_points(vec_func, arr2), exp_arr2)
         )
@@ -73,3 +75,20 @@ class TestPyUtils(unittest.TestCase):
         self.assertTrue(
             np.array_equal(put.apply_to_points(scal_func, arr2), exp_arr2_scal)
         )
+
+    def test_ndarray_to_tuple(self):
+
+        arr1 = np.atleast_1d(2)
+        exp_arr1 = (2,)
+
+        self.assertEqual(put.ndarray_to_tuple(arr1), exp_arr1)
+
+        arr2 = np.array([2, 3])
+        exp_arr2 = (2, 3)
+
+        self.assertEqual(put.ndarray_to_tuple(arr2), exp_arr2)
+
+        arr3 = np.array([[[0, 0], [1, 1], [2, 2]], [[0, 0], [1, 1], [2, 5]]])
+        exp_arr3 = (((0, 0), (1, 1), (2, 2)), ((0, 0), (1, 1), (2, 5)))
+
+        self.assertEqual(put.ndarray_to_tuple(arr3), exp_arr3)

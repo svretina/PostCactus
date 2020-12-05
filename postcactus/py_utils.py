@@ -42,3 +42,11 @@ def apply_to_points(function, array):
     """
 
     return np.apply_along_axis(function, -1, np.asarray(array))
+
+
+def ndarray_to_tuple(ndarray):
+    """Convert a nested numpy array into a nested tuple."""
+    return tuple(
+        ndarray_to_tuple(i) if isinstance(i, np.ndarray) else i
+        for i in ndarray
+    )
