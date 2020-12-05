@@ -151,6 +151,15 @@ class TestUniformGrid(unittest.TestCase):
                 [[1, 3], [2, 4]],
             )
         )
+        # Check that they are tuple
+        self.assertTrue(
+            all(
+                (
+                    isinstance(t, tuple)
+                    for t in geom.coordinates_to_indices([[2, 3.5], [3, 4]])
+                )
+            )
+        )
 
     def test__in__(self):
 
@@ -788,7 +797,6 @@ class TestUniformGridData(unittest.TestCase):
         )
 
         # Test __call__
-
         self.assertAlmostEqual(
             sin_data_complex([np.pi / 3]),
             (1 + 1j) * np.sin(np.pi / 3),
@@ -819,7 +827,7 @@ class TestUniformGridData(unittest.TestCase):
         # Vector input
         self.assertTrue(
             np.allclose(
-                sin_data_complex.evaluate_with_spline([np.pi / 3, np.pi / 4]),
+                sin_data_complex.evaluate_with_spline([[np.pi / 3], [np.pi / 4]]),
                 np.array(
                     [
                         (1 + 1j) * np.sin(np.pi / 3),

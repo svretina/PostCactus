@@ -37,6 +37,7 @@ import numpy as np
 from scipy import interpolate, linalg
 
 from postcactus.numerical import BaseNumerical
+from postcactus.py_utils import apply_to_points, ndarray_to_tuple
 
 
 class UniformGrid:
@@ -356,12 +357,14 @@ class UniformGrid:
         :param coordinates: Coordinates.
         :type coordinates:  1d numpy array or list of float
         :returns: grid indidces of nearest point.
-        :rtype:   array of int
+        :rtype:   tuple or list of tuples
         """
         # TODO: Add dimensionality checks
-        return (((np.asarray(coordinates) - self.x0) / self.dx) + 0.5).astype(
-            np.int32
-        )
+        indices = (
+            ((np.asarray(coordinates) - self.x0) / self.dx) + 0.5
+        ).astype(np.int32)
+        # We want tuples because we want to use this for slicing
+        return ndarray_to_tuple(indices)
 
     def __getitem__(self, index):
         """Return the coordinates corresponding to a given (multi-dimensional)
@@ -615,7 +618,7 @@ def common_bounding_box(grids):
     #         [0, 0, 3]]
     # x1sT = [[5, 2, 1],
     #         [5, 2, 2]]
-    # In this way we put all the same coordiantes in a single
+    # In this way we put all the same coordinates in a single
     # row. We can take the minimum and maximum along these rows
     # to find the common bounding box.
     x0 = np.array([min(b) for b in np.transpose(x0s)])
@@ -989,6 +992,8 @@ class UniformGridData(BaseNumerical):
 
         Only nearest neighbor or multilinear interpolations are available.
 
+        Computing spline is memory intenstive: 150 MB/million points.
+
         This function is not meant to be called directly.
 
         :param k: Order of the interpolation (k = 0 or 1)
@@ -1075,31 +1080,31 @@ class UniformGridData(BaseNumerical):
         if ext not in (1, 2):
             raise ValueError("Only ext=1 or ext=2 are available")
 
-        # Check if we have the point on the grid, in that case return the
-        # value. At the moment, we do this only if x is one single point.
-        #
-        # Not a UniformGrid and only a single point
-        if not isinstance(x, UniformGrid) and np.asarray(x).shape == (
-            self.num_dimensions,
-        ):
-            # Either we have the point exactly on the grid, or we
-            # are called with piecewise_constant=True
-            #
-            # The second conditions means:
-            # On each dimension, we have it on the grid.
-            if piecewise_constant or all(
-                x[dim] in self.grid.coordinates_1d[dim]
-                for dim in range(self.num_dimensions)
-            ):
-                # ext == 1 means that we have to set the point to zero if it is
-                # outside the grid. ext = 2 means that we return error.
-                if x not in self.grid:
-                    if ext == 1:
-                        # We must keep the type consistent
-                        return (np.asarray(0, dtype=self.dtype)).item()
-                    if ext == 2:
-                        raise ValueError("Point outside the grid")
-                return self.data[tuple(self.grid.coordinates_to_indices(x))]
+        # # Check if we have the point on the grid, in that case return the
+        # # value. At the moment, we do this only if x is one single point.
+        # #
+        # # Not a UniformGrid and only a single point
+        # if not isinstance(x, UniformGrid) and np.asarray(x).shape == (
+        #     self.num_dimensions,
+        # ):
+        #     # Either we have the point exactly on the grid, or we
+        #     # are called with piecewise_constant=True
+        #     #
+        #     # The second conditions means:
+        #     # On each dimension, we have it on the grid.
+        #     if piecewise_constant or all(
+        #         x[dim] in self.grid.coordinates_1d[dim]
+        #         for dim in range(self.num_dimensions)
+        #     ):
+        #         # ext == 1 means that we have to set the point to zero if it is
+        #         # outside the grid. ext = 2 means that we return error.
+        #         if x not in self.grid:
+        #             if ext == 1:
+        #                 # We must keep the type consistent
+        #                 return (np.asarray(0, dtype=self.dtype)).item()
+        #             if ext == 2:
+        #                 raise ValueError("Point outside the grid")
+        #         return self.data[tuple(self.grid.coordinates_to_indices(x))]
 
         if isinstance(x, UniformGrid):
             if x.num_dimensions != self.num_dimensions:
@@ -1112,36 +1117,89 @@ class UniformGridData(BaseNumerical):
             # value, and not the first index.
             x = np.moveaxis(x.coordinates(as_same_shape=True), 0, -1)
 
-        x = np.atleast_1d(np.array(x))
+        # x = np.atleast_1d(x)
         # x is now a new copy
 
         # Is the input a single point? If yes we return a single value
-        input_one_point = x.shape == (self.num_dimensions,)
+        # input_one_point = x.shape == (self.num_dimensions,)
 
         # TODO: We can do better than this. If piecewise_constant is True
         #       we can handle more points at the same time.
 
         # If there are flat dimensions, we must use the nearest method
+        # if piecewise_constant or (
+        #     self.num_dimensions != self.num_extended_dimensions
+        # ):
+
+        #     # To loop over all the points we reshape x so that it has only one
+        #     # level
+        #     old_shape = x.shape
+        #     # np.prod(old_shape[:-1]) returns the total number of points
+        #     num_points = np.prod(old_shape[:-1], dtype=np.int)
+        #     # If we have only one point, we must transform it into a list that we
+        #     # loop over
+        #     new_shape = (num_points, old_shape[-1])
+        #     ret = np.zeros(num_points, dtype=self.dtype)
+        #     x = x.reshape(new_shape)
+        #     for index, point in enumerate(x):
+        #         ret[index] = self.evaluate_with_spline(
+        #             point, ext=ext, piecewise_constant=True
+        #         )
+
+        #     return ret[0] if input_one_point else ret.reshape(old_shape[:-1])
         if piecewise_constant or (
             self.num_dimensions != self.num_extended_dimensions
         ):
 
-            # To loop over all the points we reshape x so that it has only one
-            # level
-            old_shape = x.shape
-            # np.prod(old_shape[:-1]) returns the total number of points
-            num_points = np.prod(old_shape[:-1], dtype=np.int)
-            # If we have only one point, we must transform it into a list that we
-            # loop over
-            new_shape = (num_points, old_shape[-1])
-            ret = np.zeros(num_points, dtype=self.dtype)
-            x = x.reshape(new_shape)
-            for index, point in enumerate(x):
-                ret[index] = self.evaluate_with_spline(
-                    point, ext=ext, piecewise_constant=True
+            def piecewise_interpolation(points):
+                # To implement the piecewise constant spline, we just lookup the
+                # data, so first we get the corresponding indices.
+                indices = self.grid.coordinates_to_indices(points)
+                # Here we have to directly implement the support for ext = 1 and
+                # ext = 2. We find all the points that are outside the
+                # boundaries.
+
+                # Here we check for every point if they have have negative index
+                # or index larger than the shape (number of points)
+                outside_indices = np.apply_along_axis(
+                    lambda p: (np.any(p < 0) or np.any(p >= self.shape)),
+                    -1,
+                    indices,
                 )
 
-            return ret[0] if input_one_point else ret.reshape(old_shape[:-1])
+                # For ext = 1 we use np.take with mode 'wrap' so that we can
+                # read all the indices, then we substitute those that are in
+                # the outside_indices array with zeros
+
+                # With take we have to convert the index to a linear index
+                take_indices = np.apply_along_axis(
+                    lambda i: np.ravel_multi_index(
+                        i, self.data.shape, mode="wrap"
+                    ),
+                    -1,
+                    indices,
+                )
+                ret = np.take(
+                    self.data,
+                    ndarray_to_tuple(take_indices),
+                )
+
+                # Here we have outside values
+                if np.any(outside_indices):
+                    # For ext = 2, we simply have the raise an error if we have
+                    # any outside_index
+                    if ext == 2:
+                        raise ValueError("Point outside the grid")
+                    if ext == 1:
+                        ret[outside_indices] = 0
+                return ret
+
+            return apply_to_points(
+                piecewise_interpolation,
+                x,
+                num_dimensions=self.num_dimensions,
+                ufunc=True,
+            )
 
         # We are here only with method = linear
 
@@ -1157,21 +1215,25 @@ class UniformGridData(BaseNumerical):
             if self.is_complex():
                 self.spline_imag.bounds_error = False
 
-        y_real = self.spline_real(x)
-        if self.is_complex():
-            y_imag = self.spline_imag(x)
-            ret = y_real + 1j * y_imag
-        else:
-            ret = y_real
+        def apply_spline(points):
+            y_real = self.spline_real(points)
+            if self.is_complex():
+                y_imag = self.spline_imag(points)
+                ret = y_real + 1j * y_imag
+            else:
+                ret = y_real
+            return ret
+
+        ret = apply_to_points(
+            apply_spline, x, num_dimensions=self.num_dimensions, ufunc=True
+        )
 
         if ext == 1:
             self.spline_real.bounds_error = True
             if self.is_complex():
                 self.spline_imag.bounds_error = True
 
-        ret = np.atleast_1d(ret)
-
-        return ret[0] if input_one_point else ret
+        return ret
 
     def __call__(self, x):
         # TODO: Avoid splines when the data is already available
