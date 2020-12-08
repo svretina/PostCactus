@@ -45,6 +45,9 @@ def apply_to_points(function, array, num_dimensions, ufunc=False):
     :returns: function applied on each single point
     :rtype: numpy array
     """
+
+    # TODO: This function is very inelegant
+
     # The case with 1D scalar data is tricky because it is not an array
     input_is_scalar = not hasattr(array, "__len__")
 
@@ -92,7 +95,9 @@ def apply_to_points(function, array, num_dimensions, ufunc=False):
 
 
 def ndarray_to_tuple(ndarray):
-    """Convert a nested numpy array into a nested tuple."""
+    """Convert a nested numpy array into a nested tuple.
+
+    It can be slow."""
     return tuple(
         ndarray_to_tuple(i) if isinstance(i, np.ndarray) else i
         for i in ndarray

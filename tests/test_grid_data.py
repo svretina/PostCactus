@@ -170,15 +170,6 @@ class TestUniformGrid(unittest.TestCase):
                 [[1, 3], [2, 4]],
             )
         )
-        # Check that they are tuple
-        self.assertTrue(
-            all(
-                (
-                    isinstance(t, tuple)
-                    for t in geom.coordinates_to_indices([[2, 3.5], [3, 4]])
-                )
-            )
-        )
 
     def test__in__(self):
 
@@ -828,8 +819,8 @@ class TestUniformGridData(unittest.TestCase):
 
         # Test on a point outside the grid with the lookup table
         with self.assertRaises(ValueError):
-            sin_data_complex.evaluate_with_spline(
-                [1000], ext=2, piecewise_constant=True
+            sin_data_complex._nearest_neighbor_interpolation(
+                np.array([1000]), ext=2,
             ),
 
         # Test on a point outside the grid with the lookup table and

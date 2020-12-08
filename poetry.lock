@@ -1243,6 +1243,17 @@ optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
 
 [[package]]
+name = "snakeviz"
+version = "2.1.0"
+description = "A web-based viewer for Python profiler output"
+category = "dev"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+tornado = ">=2.0"
+
+[[package]]
 name = "snowballstemmer"
 version = "2.0.0"
 description = "This package provides 26 stemmers for 25 languages generated from Snowball algorithms."
@@ -1556,7 +1567,7 @@ testing = ["pytest (>=3.5,!=3.7.3)", "pytest-checkdocs (>=1.2.3)", "pytest-flake
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6"
-content-hash = "1eaff443ff020ccc35d9e0498302fc3504ec14b9bb77a580f4778884525fb279"
+content-hash = "9e3f977a4bf7247436e99817b5f98cae76f370843416c1e16d46727f97660e2d"
 
 [metadata.files]
 alabaster = [
@@ -2417,6 +2428,10 @@ send2trash = [
 six = [
     {file = "six-1.15.0-py2.py3-none-any.whl", hash = "sha256:8b74bedcbbbaca38ff6d7491d76f2b06b3592611af620f8426e82dddb04a5ced"},
     {file = "six-1.15.0.tar.gz", hash = "sha256:30639c035cdb23534cd4aa2dd52c3bf48f06e5f4a941509c8bafd8ce11080259"},
+]
+snakeviz = [
+    {file = "snakeviz-2.1.0-py2.py3-none-any.whl", hash = "sha256:8ce375b18ae4a749516d7e6c6fbbf8be6177c53974f53534d8eadb646cd279b1"},
+    {file = "snakeviz-2.1.0.tar.gz", hash = "sha256:92ad876fb6a201a7e23a6b85ea96d9643a51e285667c253a8653643804f7cb68"},
 ]
 snowballstemmer = [
     {file = "snowballstemmer-2.0.0-py2.py3-none-any.whl", hash = "sha256:209f257d7533fdb3cb73bdbd24f436239ca3b2fa67d56f6ff88e86be08cc5ef0"},
