@@ -130,8 +130,27 @@ class TestUniformGrid(unittest.TestCase):
             time=1,
             iteration=1,
         )
-        # Hopefully it is fine to hardcode the expected hash
-        self.assertEqual(hash(geom4), 3458957428635756327)
+
+        hash_shape = hash(tuple(geom4.shape))
+        hash_x0 = hash(tuple(geom4.x0))
+        hash_dx = hash(tuple(geom4.dx))
+        hash_num_ghost = hash(tuple(geom4.num_ghost))
+        hash_ref_level = hash(geom4.ref_level)
+        hash_component = hash(geom4.component)
+        hash_time = hash(geom4.time)
+        hash_iteration = hash(geom4.iteration)
+
+        self.assertEqual(
+            hash(geom4),
+            hash_shape
+            ^ hash_x0
+            ^ hash_dx
+            ^ hash_num_ghost
+            ^ hash_ref_level
+            ^ hash_component
+            ^ hash_time
+            ^ hash_iteration,
+        )
 
     def test_coordinate_to_indices(self):
         geom = gd.UniformGrid([101, 51], x0=[1, 2], dx=[1, 0.5])
@@ -798,15 +817,13 @@ class TestUniformGridData(unittest.TestCase):
 
         # Test __call__
         self.assertAlmostEqual(
-            sin_data_complex([np.pi / 3]),
-            (1 + 1j) * np.sin(np.pi / 3),
+            sin_data_complex([np.pi / 3]), (1 + 1j) * np.sin(np.pi / 3),
         )
 
         # Test on a point of the grid
         point = [sin_data.grid.coordinates_1d[0][2]]
         self.assertAlmostEqual(
-            sin_data_complex(point),
-            (1 + 1j) * np.sin(point[0]),
+            sin_data_complex(point), (1 + 1j) * np.sin(point[0]),
         )
 
         # Test on a point outside the grid with the lookup table
@@ -827,7 +844,9 @@ class TestUniformGridData(unittest.TestCase):
         # Vector input
         self.assertTrue(
             np.allclose(
-                sin_data_complex.evaluate_with_spline([[np.pi / 3], [np.pi / 4]]),
+                sin_data_complex.evaluate_with_spline(
+                    [[np.pi / 3], [np.pi / 4]]
+                ),
                 np.array(
                     [
                         (1 + 1j) * np.sin(np.pi / 3),
@@ -848,8 +867,7 @@ class TestUniformGridData(unittest.TestCase):
         prod_data_complex = (1 + 1j) * prod_data
 
         self.assertAlmostEqual(
-            prod_data_complex.evaluate_with_spline((2, 3)),
-            (1 + 1j) * 10,
+            prod_data_complex.evaluate_with_spline((2, 3)), (1 + 1j) * 10,
         )
 
         # Vector input
@@ -871,8 +889,7 @@ class TestUniformGridData(unittest.TestCase):
 
         # Real data
         self.assertAlmostEqual(
-            prod_data.evaluate_with_spline((2, 3)),
-            10,
+            prod_data.evaluate_with_spline((2, 3)), 10,
         )
 
         # Extrapolate outside
@@ -987,8 +1004,7 @@ class TestUniformGridData(unittest.TestCase):
             ug_data.norm1(), np.sum(np.abs(data)) * self.geom.dv
         )
         self.assertAlmostEqual(
-            ug_data.norm2(),
-            np.sum(np.abs(data) ** 2 * self.geom.dv) ** 0.5,
+            ug_data.norm2(), np.sum(np.abs(data) ** 2 * self.geom.dv) ** 0.5,
         )
         self.assertAlmostEqual(
             ug_data.norm_p(3),
