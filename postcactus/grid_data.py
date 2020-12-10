@@ -386,12 +386,12 @@ class UniformGrid:
         """
 
         # A pythonic way to write this function is:
-        # if np.any(point < (self.__lower_edge)) or np.any(
-        #     point > (self.__upper_edge)
+        # if np.any(point < (self.lowest_vertex)) or np.any(
+        #     point > (self.highest_vertex)
         # ):
         #     return False
         # return True
-        #
+
         # However, this happens to be not the fastest. This method is called a
         # huge number of times when in HierarchicalGridData methods, because it
         # is the main method to find which grid contains a given point.
